@@ -8,7 +8,8 @@ services:
     ports:
       - 4444:4444
     depends_on:
-      - frontend
+      - db1
+      - db2
   
   frontend:
     container_name: frontend
@@ -19,8 +20,8 @@ services:
     ports:
       - 80:3000
     depends_on:
-      - db1
-      - db2
+      - backend
+    
 
   db1:
     container_name: db1
@@ -43,6 +44,7 @@ services:
     environment:
       - MYSQL_DATABASE=db
       - MYSQL_ROOT_PASSWORD=db123456
+
 
 volumes:
   db_1:
