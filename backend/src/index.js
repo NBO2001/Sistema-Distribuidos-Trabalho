@@ -11,6 +11,8 @@ app.use(
 
 app.use(express.json());
 
+app.get("/", (req, res) => res.status(200).send({running: true}) );
+
 app.get("/songs", async (req, res) => {
     
     const database = req.query.bd ? Number(req.query.bd) : 1;

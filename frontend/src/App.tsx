@@ -6,6 +6,9 @@ import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { SelectButton } from "primereact/selectbutton";
 import { deleteSongs, getSongs, insertSongs } from "./service/music";
+import { Card } from "primereact/card";
+import { Divider } from "primereact/divider";
+import { InputText } from "primereact/inputtext";
 
 export type TSong = {
   id: string,
@@ -66,6 +69,7 @@ function App() {
       setSongs([...songs, data])
       
       setNewSong({ title: "", to: 1 });
+      setValue([]);
       setDialogVisible(false);
 
     }catch(err){
@@ -131,14 +135,15 @@ function App() {
 
   return (
     <div>
-      <div className="card">
+      <Card title="Sistemas Distribuidos Trabalho">
         <Button label="Add New Song" icon="pi pi-plus" onClick={() => setDialogVisible(true)} />
+        <Divider />
         <DataTable value={songs} showGridlines tableStyle={{ minWidth: '50rem' }}>
           <Column field="title" header="Title"></Column>
           <Column field="from" header="Database" body={fromBodyTemplate}></Column>
           <Column header="Action" body={actionBodyTemplate}></Column>
         </DataTable>
-      </div>
+      </Card>
 
       <Dialog
         header="Add New Song"
@@ -149,19 +154,15 @@ function App() {
         <div className="p-fluid">
           <div className="p-field">
             <label htmlFor="title">Title</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={newSong.title}
-              onChange={handleInputChange}
-              className="p-inputtext p-component"
-            />
+            <InputText id="title" name="title" value={newSong.title} onChange={handleInputChange} />
           </div>
           <div className="p-field">
             <label htmlFor="from">Database</label>
-            <SelectButton value={value} onChange={handleSelectChange} optionLabel="name" options={items} multiple />
+            <SelectButton value={value} onChange={handleSelectChange} optionLabel="name"
+            options={items} multiple
+            style={{"marginBottom": "5px"}} />
           </div>
+          <Divider />
           <Button label="Add Song" icon="pi pi-check" onClick={handleAddSong} />
         </div>
       </Dialog>
@@ -182,6 +183,7 @@ function App() {
               options={selectedSong ? removeOptions(selectedSong.from) : []}
             />
           </div>
+          <Divider />
           <Button label="Remove Song" icon="pi pi-check" onClick={handleRemoveSong} />
         </div>
       </Dialog>

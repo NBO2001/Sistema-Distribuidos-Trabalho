@@ -1,27 +1,6 @@
+version: '3.7'
+
 services:
-  backend:
-    container_name: backend
-    build: 
-      context: ./backend
-    volumes:
-      - ./backend/src:/app/src
-    ports:
-      - 4444:4444
-    depends_on:
-      - db1
-      - db2
-  
-  frontend:
-    container_name: frontend
-    build: 
-      context: ./frontend
-    volumes:
-      - ./frontend/src:/app/src
-    ports:
-      - 80:3000
-    depends_on:
-      - backend
-    
 
   db1:
     container_name: db1
@@ -33,6 +12,11 @@ services:
     environment:
       - MYSQL_DATABASE=db
       - MYSQL_ROOT_PASSWORD=db123456
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -pdb123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   db2:
     container_name: db2
@@ -44,7 +28,43 @@ services:
     environment:
       - MYSQL_DATABASE=db
       - MYSQL_ROOT_PASSWORD=db123456
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -pdb123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
+  backend:
+    container_name: backend
+    build: 
+      context: ./backend
+    volumes:
+      - ./backend/src:/app/src
+    ports:
+      - 4444:4444
+    depends_on:
+      db1:
+        condition: service_healthy
+      db2:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4444 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: sh -c "node src/seed.js && npm start" 
+  
+  frontend:
+    container_name: frontend
+    build: 
+      context: ./frontend
+    volumes:
+      - ./frontend/src:/app/src
+    ports:
+      - 80:3001
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   db_1:
