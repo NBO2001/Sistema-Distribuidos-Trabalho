@@ -76,22 +76,26 @@ const insertIntoDb2 = async ({id, title}) => {
 
 export const insert = async (title, dbFlag) => {
   const id = uuidv4();
-
+  let from = []
   try {
     if (dbFlag === 1) {
       await insertIntoDb1({id, title});
+      from.push('db1');
     } else if (dbFlag === 2) {
       await insertIntoDb2({id, title});
+      from.push('db2');
     } else if (dbFlag === 3) {
       await insertIntoDb1({id, title});
+      from.push('db1');
       await insertIntoDb2({id, title});
+      from.push('db2');
     } else {
       return { id: null };
     }
-    return { id };
+    return { id, title, from };
   } catch (err) {
     console.log(err);
-    return { id: null };
+    return { id: null, title: null, from: [] };
   }
 };
 

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { SelectButton } from "primereact/selectbutton";
+import { getSongs, insertSongs } from "./service/music";
 
 export type TSong = {
   id: string,
@@ -12,59 +13,64 @@ export type TSong = {
   from: Array<string>
 }
 
+export type TSongCreate = {
+  title: string,
+  to: Number
+}
+
 function App() {
-  const [songs, setSongs] = useState<TSong[]>([
-    {
-      id: "acf6fd4c-e2de-40a9-a164-d5a0258cbdd9",
-      title: "topis",
-      from: ["db1"]
-    },
-    {
-      id: "f061b085-aae8-4cc0-b583-9357c885117b",
-      title: "dont blame me 58",
-      from: ["db1", "db2"]
-    },
-    {
-      id: "3d5a4313-fcf1-42d9-abad-39328416adbe",
-      title: "dont blame me 5",
-      from: ["db2"]
-    },
-    {
-      id: "9c0cd1e0-4d0c-4ed6-a878-b61e710eea13",
-      title: "dont blame me",
-      from: ["db2"]
-    },
-    {
-      id: "9feb58f0-d4fe-40c1-b935-94b13210b063",
-      title: "harmonic",
-      from: ["db2"]
-    }
-  ]);
+  const [songs, setSongs] = useState<TSong[]>([]);
 
   const [dialogVisible, setDialogVisible] = useState(false);
   const [removeDialogVisible, setRemoveDialogVisible] = useState(false);
-  const [newSong, setNewSong] = useState<TSong>({ id: "", title: "", from: [] });
+  const [newSong, setNewSong] = useState<TSongCreate>({ title: "", to: 1 });
   const [value, setValue] = useState<string[]>([]);
   const [removeValue, setRemoveValue] = useState<string | null>(null);
   const [selectedSong, setSelectedSong] = useState<TSong | null>(null);
 
+
+  useEffect( () => {
+    
+    const songsRequest = async () => {
+      try{
+        const data = await getSongs();
+        setSongs(data);
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+    songsRequest();
+
+  }, []);
+
   const items = [
-    { name: 'Database 1', value: 'db1' },
-    { name: 'Database 2', value: 'db2' }
+    { name: 'Database 1', value: 1 },
+    { name: 'Database 2', value: 2 }
   ];
 
   const removeOptions = (from: string[]) => {
     let options = [];
-    if (from.includes('db1')) options.push({ name: 'Database 1', value: 'db1' });
-    if (from.includes('db2')) options.push({ name: 'Database 2', value: 'db2' });
-    if (from.length === 2) options.push({ name: 'All', value: 'ALL' });
+    if (from.includes('db1')) options.push({ name: 'Database 1', value: 1 });
+    if (from.includes('db2')) options.push({ name: 'Database 2', value: 2 });
+    if (from.length === 2) options.push({ name: 'All', value: 3 });
     return options;
   };
 
-  const handleAddSong = () => {
-    setSongs([...songs, { ...newSong, id: Date.now().toString() }]);
-    setNewSong({ id: "", title: "", from: [] });
-    setDialogVisible(false);
+  const handleAddSong = async () => {
+    
+    try{
+      const data = await insertSongs(newSong);
+      
+      setSongs([...songs, data])
+      
+      setNewSong({ title: "", to: 1 });
+      setDialogVisible(false);
+
+    }catch(err){
+      console.log(err);
+    }
+
   };
 
   const handleRemoveSong = () => {
@@ -93,7 +99,7 @@ function App() {
 
   const handleSelectChange = (e: any) => {
     setValue(e.value);
-    setNewSong(prev => ({ ...prev, from: e.value }));
+    setNewSong(prev => ({ ...prev, to: e.value.reduce((partialSum:any, a: number) => partialSum + a, 0) }));
   };
 
   const handleRemoveSelectChange = (e: any) => {

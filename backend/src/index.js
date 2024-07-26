@@ -1,13 +1,17 @@
 import express from "express";
 import { deleteSong, getAll, insert } from "./services/songs.js";
-
+import cors from "cors";
 
 const app = express();
 const PORT = 4444;
 
+app.use(
+    cors(),
+);
+
 app.use(express.json());
 
-app.get("/", async (req, res) => {
+app.get("/songs", async (req, res) => {
     
     const database = req.query.bd ? Number(req.query.bd) : 1;
     
@@ -18,7 +22,7 @@ app.get("/", async (req, res) => {
 });
 
 
-app.post("/", async (req, res) => {
+app.post("/songs", async (req, res) => {
     
     const database = req.query.bd ? Number(req.query.bd) : 1;
 
@@ -30,7 +34,7 @@ app.post("/", async (req, res) => {
    
 });
 
-app.delete("/:id", async (req, res) => {
+app.delete("/songs/:id", async (req, res) => {
     
     const id = req.params.id;
 
