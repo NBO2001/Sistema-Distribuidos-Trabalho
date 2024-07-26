@@ -6,7 +6,7 @@ import { Conn } from "./Conn.js";
     
     await conn.query(`
       CREATE TABLE IF NOT EXISTS songs (
-        id SERIAL PRIMARY KEY,
+        id VARCHAR(255) PRIMARY KEY,
         title VARCHAR(255) NOT NULL
       );
     `);
@@ -18,7 +18,7 @@ import { Conn } from "./Conn.js";
     
     await conn.query(`
       CREATE TABLE IF NOT EXISTS songs (
-        id SERIAL PRIMARY KEY,
+        id VARCHAR(255) PRIMARY KEY,
         title VARCHAR(255) NOT NULL
       );
     `);
@@ -29,5 +29,4 @@ import { Conn } from "./Conn.js";
   } catch (err) {
     console.error("Error creating table 'songs':", err);
   }
-
 })();
