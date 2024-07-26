@@ -5,7 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { SelectButton } from "primereact/selectbutton";
-import { getSongs, insertSongs } from "./service/music";
+import { deleteSongs, getSongs, insertSongs } from "./service/music";
 
 export type TSong = {
   id: string,
@@ -18,6 +18,11 @@ export type TSongCreate = {
   to: Number
 }
 
+export type TSongRemove = {
+  id: string,
+  from: Number
+}
+
 function App() {
   const [songs, setSongs] = useState<TSong[]>([]);
 
@@ -28,21 +33,17 @@ function App() {
   const [removeValue, setRemoveValue] = useState<string | null>(null);
   const [selectedSong, setSelectedSong] = useState<TSong | null>(null);
 
-
-  useEffect( () => {
-    
-    const songsRequest = async () => {
-      try{
-        const data = await getSongs();
-        setSongs(data);
-      }catch(err){
-        console.log(err)
-      }
+  const songsRequest = async () => {
+    try{
+      const data = await getSongs();
+      setSongs(data);
+    }catch(err){
+      console.log(err)
     }
+  }
 
-    songsRequest();
 
-  }, []);
+  useEffect( () => {songsRequest();}, []);
 
   const items = [
     { name: 'Database 1', value: 1 },
@@ -73,22 +74,18 @@ function App() {
 
   };
 
-  const handleRemoveSong = () => {
-    if (selectedSong) {
-      setSongs(songs.map(song => {
-        if (song.id === selectedSong.id) {
-          if (removeValue === 'ALL') {
-            return { ...song, from: [] };
-          } else {
-            return {
-              ...song,
-              from: song.from.filter(db => db !== removeValue)
-            };
-          }
-        }
-        return song;
-      }));
+  const handleRemoveSong = async () => {
+
+    try{
+      if(selectedSong){
+        const data = await deleteSongs({id: selectedSong?.id, from: Number(removeValue)});
+        if(data) songsRequest();
+      }
+
       setRemoveDialogVisible(false);
+
+    }catch(err){
+      console.log(err);
     }
   };
 

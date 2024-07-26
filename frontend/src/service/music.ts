@@ -1,4 +1,4 @@
-import { TSongCreate } from "../App";
+import { TSongCreate, TSongRemove } from "../App";
 import api from "./api";
 
 
@@ -17,6 +17,17 @@ export const insertSongs = async ({title, to}: TSongCreate) => {
 
   try{
     const { data } = await api.post(`/songs?bd=${to}`, {title});
+    return data;
+
+  }catch(err){
+    throw err
+  }
+}
+
+export const deleteSongs = async ({id, from}: TSongRemove) => {
+
+  try{
+    const { data } = await api.delete(`/songs/${id}?bd=${from}`);
     return data;
 
   }catch(err){
